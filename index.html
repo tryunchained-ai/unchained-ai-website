@@ -840,7 +840,7 @@
       <h4>Company</h4>
       <ul>
         <li><a href="https://calendar.google.com/calendar/appointments/schedules" target="_blank">Book a Demo</a></li>
-        <li><a href="mailto:cowen@tryunchained.ai">cowen@tryunchained.ai</a></li>
+        <li><a href="/cdn-cgi/l/email-protection#f4979b83919ab480868d819a979c959d9a9190da959d"><span class="__cf_email__" data-cfemail="13707c64767d5367616a667d707b727a7d76773d727a">[email&#160;protected]</span></a></li>
         <li><a href="#demos">Live Agents</a></li>
       </ul>
     </div>
@@ -851,8 +851,12 @@
   </div>
 </footer>
 
-<!-- VAPI WEB SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
+<!-- VAPI WEB SDK - loaded as ES module -->
+<script type="module">
+  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.2.3/dist/vapi.mjs";
+  window.__VapiClass = Vapi;
+  window.dispatchEvent(new Event("vapi-ready"));
+</script>
 
 <script>
   // =====================
@@ -916,7 +920,11 @@
     try {
       // Initialize Vapi if not already done
       if (!vapi) {
-        vapi = new Vapi(VAPI_PUBLIC_KEY);
+        // Wait for the ES module to load if not ready yet
+        if (!window.__VapiClass) {
+          await new Promise((resolve) => window.addEventListener("vapi-ready", resolve, { once: true }));
+        }
+        vapi = new window.__VapiClass(VAPI_PUBLIC_KEY);
 
         vapi.on("call-start", () => {
           callActive = true;

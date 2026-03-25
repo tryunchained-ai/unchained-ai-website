@@ -851,8 +851,8 @@
   </div>
 </footer>
 
-<!-- VAPI WEB SDK - official html-script-tag -->
-<script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
+<!-- VAPI WEB SDK -->
+<script src="https://unpkg.com/@vapi-ai/web@latest/dist/vapi.iife.js"></script>
 
 <script>
   // =====================
@@ -920,22 +920,18 @@
       document.getElementById("statusSub").textContent = "Allow microphone access if prompted";
       document.getElementById("btnStart").disabled = true;
 
-      // Wait for vapiSDK script to load
-      if (!window.vapiSDK) {
+      // Wait for Vapi SDK to be available
+      if (!window.Vapi) {
         await new Promise((resolve, reject) => {
           const check = setInterval(() => {
-            if (window.vapiSDK) { clearInterval(check); resolve(); }
+            if (window.Vapi) { clearInterval(check); resolve(); }
           }, 100);
-          setTimeout(() => { clearInterval(check); reject(new Error("vapiSDK timed out")); }, 6000);
+          setTimeout(() => { clearInterval(check); reject(new Error("Vapi SDK timed out")); }, 6000);
         });
       }
 
-      // Create instance and wire events fresh each call
-      vapi = window.vapiSDK.run({
-        apiKey: VAPI_PUBLIC_KEY,
-        assistant: currentAgent.id,
-        config: { hideButton: true }
-      });
+      // Create fresh instance and start call
+      vapi = new window.Vapi(VAPI_PUBLIC_KEY);
 
       vapi.on("call-start", () => {
         callActive = true;
@@ -970,6 +966,9 @@
         document.getElementById("statusSub").textContent = "Check microphone permissions and try again";
         resetCallUI();
       });
+
+      // Start the call
+      await vapi.start(currentAgent.id);
 
     } catch (err) {
       console.error("Failed to start call:", err);

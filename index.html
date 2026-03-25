@@ -851,12 +851,8 @@
   </div>
 </footer>
 
-<!-- VAPI WEB SDK - loaded as ES module -->
-<script type="module">
-  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.2.3/dist/vapi.mjs";
-  window.__VapiClass = Vapi;
-  window.dispatchEvent(new Event("vapi-ready"));
-</script>
+<!-- VAPI WEB SDK - official html-script-tag -->
+<script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js" defer></script>
 
 <script>
   // =====================
@@ -919,52 +915,61 @@
 
     try {
       // Initialize Vapi if not already done
-      if (!vapi) {
-        // Wait for the ES module to load if not ready yet
-        if (!window.__VapiClass) {
-          await new Promise((resolve) => window.addEventListener("vapi-ready", resolve, { once: true }));
-        }
-        vapi = new window.__VapiClass(VAPI_PUBLIC_KEY);
-
-        vapi.on("call-start", () => {
-          callActive = true;
-          document.getElementById("statusTitle").textContent = "Connected";
-          document.getElementById("statusSub").textContent = "You're live — speak naturally";
-          document.getElementById("statusIcon").classList.add("calling");
-          document.getElementById("callWave").classList.add("active");
-          document.getElementById("btnStart").style.display = "none";
-          document.getElementById("btnEnd").classList.add("visible");
-          document.getElementById("callTimer").classList.add("visible");
-          startTimer();
-        });
-
-        vapi.on("call-end", () => {
-          callActive = false;
-          stopTimer();
-          document.getElementById("statusTitle").textContent = "Call Ended";
-          document.getElementById("statusSub").textContent = "Thanks for trying the demo!";
-          document.getElementById("statusIcon").classList.remove("calling");
-          document.getElementById("statusIcon").textContent = "✓";
-          document.getElementById("callWave").classList.remove("active");
-          document.getElementById("btnEnd").classList.remove("visible");
-          document.getElementById("btnStart").style.display = "flex";
-          document.getElementById("btnStart").textContent = "🔄  Call Again";
-        });
-
-        vapi.on("error", (error) => {
-          console.error("Vapi error:", error);
-          document.getElementById("statusTitle").textContent = "Connection Error";
-          document.getElementById("statusSub").textContent = "Please check your microphone and try again";
-          resetCallUI();
-        });
-      }
-
       // Update UI to connecting state
       document.getElementById("statusTitle").textContent = "Connecting...";
       document.getElementById("statusSub").textContent = "Allow microphone access if prompted";
       document.getElementById("btnStart").disabled = true;
 
-      await vapi.start(currentAgent.id);
+      // Wait for vapiSDK script to load
+      if (!window.vapiSDK) {
+        await new Promise((resolve, reject) => {
+          const check = setInterval(() => {
+            if (window.vapiSDK) { clearInterval(check); resolve(); }
+          }, 100);
+          setTimeout(() => { clearInterval(check); reject(new Error("vapiSDK timed out")); }, 6000);
+        });
+      }
+
+      // Create instance and wire events fresh each call
+      vapi = window.vapiSDK.run({
+        apiKey: VAPI_PUBLIC_KEY,
+        assistant: currentAgent.id,
+        config: { hideButton: true }
+      });
+
+      vapi.on("call-start", () => {
+        callActive = true;
+        document.getElementById("statusTitle").textContent = "Connected";
+        document.getElementById("statusSub").textContent = "You're live — speak naturally";
+        document.getElementById("statusIcon").classList.add("calling");
+        document.getElementById("callWave").classList.add("active");
+        document.getElementById("btnStart").style.display = "none";
+        document.getElementById("btnEnd").classList.add("visible");
+        document.getElementById("callTimer").classList.add("visible");
+        startTimer();
+      });
+
+      vapi.on("call-end", () => {
+        callActive = false;
+        vapi = null;
+        stopTimer();
+        document.getElementById("statusTitle").textContent = "Call Ended";
+        document.getElementById("statusSub").textContent = "Thanks for trying the demo!";
+        document.getElementById("statusIcon").classList.remove("calling");
+        document.getElementById("statusIcon").textContent = "✓";
+        document.getElementById("callWave").classList.remove("active");
+        document.getElementById("btnEnd").classList.remove("visible");
+        document.getElementById("btnStart").style.display = "flex";
+        document.getElementById("btnStart").disabled = false;
+        document.getElementById("btnStart").innerHTML = "🔄 &nbsp; Call Again";
+      });
+
+      vapi.on("error", (error) => {
+        console.error("Vapi error:", error);
+        document.getElementById("statusTitle").textContent = "Connection Error";
+        document.getElementById("statusSub").textContent = "Check microphone permissions and try again";
+        resetCallUI();
+      });
 
     } catch (err) {
       console.error("Failed to start call:", err);

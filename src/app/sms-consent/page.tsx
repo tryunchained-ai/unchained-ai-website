@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+"use client";
 
-export const metadata: Metadata = {
-  title: "SMS Consent Policy — Unchained AI",
-  description: "SMS consent policy and verbal consent script for Unchained AI voice agents.",
-};
+import Link from "next/link";
 
 export default function SMSConsentPage() {
   return (

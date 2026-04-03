@@ -416,7 +416,7 @@ export default function Home() {
                   Book a Demo
                 </a>
               </li>
-              <li><a href="mailto:hello@unchained.ai">hello@unchained.ai</a></li>
+              <li><a href="mailto:hello@tryunchained.ai">hello@tryunchained.ai</a></li>
               <li><a href="#demos">Live Agents</a></li>
             </ul>
           </div>

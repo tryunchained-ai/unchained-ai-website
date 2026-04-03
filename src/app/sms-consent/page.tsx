@@ -80,7 +80,7 @@ export default function SMSConsentPage() {
               <li>Standard message and data rates may apply based on your carrier and plan.</li>
               <li>We do not sell or share your phone number with third parties for marketing purposes.</li>
               <li>SMS messages are sent only in response to your specific requests during calls with our AI agents.</li>
-              <li>For questions about our SMS practices, contact us at <a href="mailto:hello@unchained.ai">hello@unchained.ai</a></li>
+              <li>For questions about our SMS practices, contact us at <a href="mailto:hello@tryunchained.ai">hello@tryunchained.ai</a></li>
             </ul>
           </section>
 

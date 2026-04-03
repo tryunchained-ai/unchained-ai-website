@@ -115,7 +115,7 @@ export default function PrivacyPage() {
               If you have questions about this Privacy Policy or our data practices, please contact us at:
             </p>
             <p className="contact-info">
-              <strong>Email:</strong> <a href="mailto:hello@unchained.ai">hello@unchained.ai</a><br />
+              <strong>Email:</strong> <a href="mailto:hello@tryunchained.ai">hello@tryunchained.ai</a><br />
               <strong>Location:</strong> Fort Lauderdale, FL
             </p>
           </section>

@@ -129,7 +129,7 @@ export default function SMSConsentPage() {
 
         .sms-main {
           flex: 1;
-          padding: 80px 48px;
+          padding: 120px 48px 80px;
         }
 
         .sms-container {
